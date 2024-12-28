@@ -1,0 +1,43 @@
+[
+    VarsDec(
+        Constvar,
+    ),
+    FuncDef(
+        FuncDef {
+            id: 8,
+            body: [
+                Stmt(
+                    Loop(
+                        Num(
+                            1,
+                        ),
+                        Block(
+                            [
+                                Stmt(
+                                    Loop(
+                                        Num(
+                                            0,
+                                        ),
+                                        Continue,
+                                    ),
+                                ),
+                                Stmt(
+                                    Break,
+                                ),
+                            ],
+                        ),
+                    ),
+                ),
+                Stmt(
+                    Return(
+                        Some(
+                            Num(
+                                0,
+                            ),
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+]

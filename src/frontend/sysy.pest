@@ -1,0 +1,85 @@
+WHITESPACE = _{" "|"\t"| NEWLINE}
+COMMENT = _{SingleLineComment|BlockComment}
+
+SingleLineComment = _{ "//" ~ (!"\n" ~ ANY)* }
+BlockComment = _{ "/*" ~ ((!"*/" ~ ANY))* ~ "*/" }
+// BlockComment = _{ "/*" ~ ((!("/*"|"*/") ~ ANY)|BlockComment)* ~ "*/" }
+
+norm_char = _{"_"| ASCII_ALPHANUMERIC}
+norm_non_num = _{"_"| ASCII_ALPHA}
+ident = @{norm_non_num~norm_char*}
+
+num_bin = @{"0b"~ASCII_BIN_DIGIT+}
+num_oct = @{"0"~ASCII_OCT_DIGIT+}
+num_dec = @{ASCII_DIGIT+}
+num_hex = @{("0x"|"0X")~ASCII_HEX_DIGIT+}
+num_flt = @{num_dec~"."~num_dec}
+number = _{num_flt|num_hex | num_oct | num_dec | num_bin}
+// currently only support postive number
+
+CompUnit = {SOI~(FuncDef|VarDec)*~EOI}
+	FuncDef = {Type~Name~"("~ParamList~")"~Block}
+		Type = @{ident}
+		Name = @{ident}
+		ParamList = {(Param~(","~Param)*)?}
+			Param = {Type~Sign}
+			Sign = {ListPara|Name}
+				ListPara = {Name~emptyidx~("["~Expr~"]")*}
+					emptyidx = {"["~"]"}
+		Block = {"{"~(Stmt|VarDec)*~"}"}
+			Stmt = {Branc|Loop|Block|((Return|Break|Continue|Expr)?~";")}
+				Expr = {prefix*~primary~postfix?~(infix~prefix*~primary~postfix?)*}
+					prefix = _{pos|neg|not|bitnot}
+						pos = @{"+"}
+						neg = @{"-"}
+						not = @{"!"}
+						bitnot = @{"~"}
+					primary = _{FuncCall|IndexCall|Name|number|"("~Expr~")"}
+						FuncCall = {Name~Tuple}
+							Tuple = {"("~(Expr~(","~Expr)*)?~")"}
+						IndexCall ={Name~("["~Expr~"]")+}
+					infix = _{addasg|subasg|mulasg|divasg|modasg|xorasg|bitandasg|bitorasg|shlasg|shrasg|leq|geq|eq|neq|add|sub|mul|div|moo|xor|logand|logor|bitand|bitor|sar|shl|shr|les|grt|asg}
+						asg = @{"="}
+						addasg = @{"+="}
+						subasg = @{"-="}
+						mulasg = @{"*="}
+						divasg = @{"/="}
+						modasg = @{"%="}
+						xorasg = @{"^="}
+						bitandasg = @{"&="}
+						bitorasg = @{"|="}
+						shlasg = @{"<<="}
+						shrasg = @{">>="}
+						leq = @{"<="}
+						geq = @{">="}
+						eq = @{"=="}
+						neq = @{"!="}
+						add = @{"+"}
+						sub = @{"-"}
+						mul = @{"*"}
+						div = @{"/"}
+						moo = @{"%"}
+						xor = @{"^"}
+						logand = @{"&&"}
+						logor = @{"||"}
+						bitand = @{"&"}
+						bitor = @{"|"}
+						sar = @{">>>"}
+						shl = @{"<<"}
+						shr = @{">>"}
+						les = @{"<"}
+						grt = @{">"}
+					postfix = @{"TODO"}
+				Return = {returnkey~Expr?}
+                returnkey = @{"return"~!(ASCII_ALPHANUMERIC|"_")}
+				Break = {"break"}
+				Continue = {"continue"}
+				Branc = {"if"~"("~Expr~")"~Stmt~("else"~Stmt)?}
+				Loop = {WhileLoop}
+					WhileLoop = {"while"~"("~Expr~")"~Stmt}
+	VarDec = {iconst?~Type~(Listdef|Vardef)~(","~(Listdef|Vardef))*~";"}
+		iconst = @{"const"~!norm_char}
+		Vardef = {Name~("="~Expr)?}
+		Listdef = {Name~listdim~("="~List)?}
+			listdim = {("["~Expr~"]")+}
+			List = {"{"~((Expr|List)~(","~(Expr|List))*)?~"}"}

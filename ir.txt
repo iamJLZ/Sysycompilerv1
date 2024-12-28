@@ -1,0 +1,17 @@
+decl @getint(): i32
+decl @getch(): i32
+decl @getarray(*i32): i32
+decl @putint(i32)
+decl @putch(i32)
+decl @putarray(i32, *i32)
+decl @starttime()
+decl @stoptime()
+global @c_1 = alloc i32, 5
+global @a_2 = alloc [i32,8], {3,0,0,0,0,0,0,0}
+fun @main():i32{
+%b0:
+@vmid = alloc i32
+%v1 = getelemptr @a_2, 4
+%v2 = load %v1
+ret %v2
+}

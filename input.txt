@@ -1,0 +1,6 @@
+const int b=3;
+int c=5;
+int a[2][4]={b};
+int main(){
+  return a[1][0];
+}

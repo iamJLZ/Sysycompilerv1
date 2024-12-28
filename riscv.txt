@@ -1,0 +1,28 @@
+  .data
+  .globl c_1
+c_1:
+  .word 5
+  .data
+  .globl a_2
+a_2:
+  .word 3,0,0,0,0,0,0,0
+  .text
+  .globl main
+main:
+  addi sp, sp, -16
+b0:
+#@vmid
+#%v1
+  la t0, a_2
+  li t1, 4
+  slli t1, t1, 2
+  add t0, t0, t1
+  sw t0, 4(sp)
+#%v2
+  lw t0, 4(sp)
+  lw t2, 0(t0)
+  sw t2, 8(sp)
+#Return(Return { value: Some(Value(1073741827)) })
+  lw a0, 8(sp)
+  addi sp, sp, 16
+  ret
